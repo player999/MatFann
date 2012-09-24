@@ -2,12 +2,14 @@
 #include "mex.h"
 #include "matrix.h"
 
+#define DATA_TYPE double
+
 typedef struct {
-	float *MSEs;
+	DATA_TYPE *MSEs;
 	unsigned int *times;
 	unsigned int *entries;
-	float **weights;
-	float **biases;
+	DATA_TYPE **weights;
+	DATA_TYPE **biases;
 	unsigned int layers;
 	unsigned int *WMs;
 	unsigned int *WNs;
@@ -15,7 +17,7 @@ typedef struct {
 	unsigned int *activation;
 	char * trainingFileName;
 	unsigned int algorithm;
-	float error;
+	DATA_TYPE error;
 	unsigned int epochs;
 	unsigned int report_interval;
 	unsigned int max_time;
@@ -35,14 +37,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	//Maximal number of epochs
 	unsigned int epochs;
 	//Desired error
-	float error;
+	DATA_TYPE error;
 	//Algorithm type
 	unsigned int algorithm;
 	//Report interval
 	unsigned int report_interval;
 	//Pointers to weights
-	float **weights;
-	float **biases;
+	DATA_TYPE **weights;
+	DATA_TYPE **biases;
 	//Pointers to weight arrays
 	mxArray **mAWeights;
 	mxArray **mABiases;
@@ -56,7 +58,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	unsigned int *activation;
 	//Output
 	unsigned int *times;//Time passed
-	float *MSEs;//Mean squared errors
+	DATA_TYPE *MSEs;//Mean squared errors
 	unsigned int *entries;//Number of entries
 	unsigned int mLogSize[2];
 	//Iterators
@@ -77,7 +79,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	trainingFileName = (char *)mxCalloc(mxGetN(prhs[3]) + 2, sizeof(char));
 	mxGetString(prhs[3], trainingFileName, mxGetN(prhs[3]) + 2);
 	epochs = (unsigned int) mxGetScalar(prhs[6]);
-	error = (float) mxGetScalar(prhs[5]);
+	error = (DATA_TYPE) mxGetScalar(prhs[5]);
 	algorithm = (unsigned int) mxGetScalar(prhs[4]);
 	report_interval = (unsigned int) mxGetScalar(prhs[7]);
 	max_time = (unsigned int) mxGetScalar(prhs[8]);
@@ -87,8 +89,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	weightNDim = (unsigned int*)mxCalloc(layers, sizeof(unsigned int));
 	weightMDim = (unsigned int*)mxCalloc(layers, sizeof(unsigned int));
 	biasDim = (unsigned int*)mxCalloc(layers, sizeof(unsigned int));
-	weights = (float **)mxCalloc(layers, sizeof(float *));
-	biases = (float **)mxCalloc(layers, sizeof(float *));
+	weights = (DATA_TYPE **)mxCalloc(layers, sizeof(DATA_TYPE *));
+	biases = (DATA_TYPE **)mxCalloc(layers, sizeof(DATA_TYPE *));
 	mAWeights = (mxArray **)mxCalloc(layers, sizeof(mxArray *));
 	mABiases = (mxArray **)mxCalloc(layers, sizeof(mxArray *));
 	
@@ -97,13 +99,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	for(i = 0; i < layers; i++){
 		mAWeights[i] = (mxArray *)mxGetFieldByNumber(mWeights, 0, i);
 		mABiases[i] = (mxArray *)mxGetFieldByNumber(mBiases, 0, i);
-		weights[i] = (float *)mxGetData(mAWeights[i]);
-		biases[i] = (float *)mxGetData(mABiases[i]);
+		weights[i] = (DATA_TYPE *)mxGetData(mAWeights[i]);
+		biases[i] = (DATA_TYPE *)mxGetData(mABiases[i]);
 		weightMDim[i] = mxGetN(mAWeights[i]);//Convert dimensions column-line storage
 		weightNDim[i] = mxGetM(mAWeights[i]);
 		biasDim[i] = mxGetM(mABiases[i]);
 	}
-	MSEs = (float *)mxCalloc(epochs, sizeof(float));
+	MSEs = (DATA_TYPE *)mxCalloc(epochs, sizeof(DATA_TYPE));
 	times = (unsigned int *)mxCalloc(epochs, sizeof(unsigned int));
 	entries = (unsigned int *)mxCalloc(1, sizeof(unsigned int));
 	

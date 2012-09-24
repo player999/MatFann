@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <fann.h>
+#include <doublefann.h>
 #include <mex.h>
 #include "fann_my_io.h"
 
 //#define DEBUG 1
+#define DATA_TYPE double
 
 void fann_save_matrices(struct fann *network, char *fname){
 	unsigned int layers;
@@ -13,11 +14,11 @@ void fann_save_matrices(struct fann *network, char *fname){
 	unsigned int total_weights;
 	unsigned int neuron_inputs;
 	unsigned int writes_counter;
-	float weight;
+	DATA_TYPE weight;
 	struct 	fann_connection *connections;
 	FILE *array;
 	char array_name[255];
-	int i, j, k;
+	int i, j;
 	writes_counter = 0;
 	layers = fann_get_num_layers(network);
 	fann_get_layer_array(network, layer);
@@ -39,7 +40,7 @@ void fann_save_matrices(struct fann *network, char *fname){
 			mexPrintf("To:\t%i\n", connections[writes_counter].to_neuron);
 			mexEvalString("drawnow;");
 #endif
-			fwrite(&weight, sizeof(float) , 1, array);
+			fwrite(&weight, sizeof(DATA_TYPE) , 1, array);
 			writes_counter++;
 		}
 		fclose(array);

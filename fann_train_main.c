@@ -1,16 +1,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <Windows.h>
-#include <fann.h>
+#include <doublefann.h>
 #include <mex.h>
 #include "fann_my_io.h"
 
 //#define DEBUG 1
+#define DATA_TYPE double
 
 typedef struct {
 	time_t seconds;
 	FILE *logFile;
-	float *MSE_log;
+	DATA_TYPE *MSE_log;
 	unsigned int *time_log;
 	unsigned int log_rows;
 	unsigned int max_time;
@@ -20,11 +21,11 @@ typedef struct {
 }callback_params;
 
 typedef struct {
-	float *MSEs;
+	DATA_TYPE *MSEs;
 	unsigned int *times;
 	unsigned int *entries;
-	float **weights;
-	float **biases;
+	DATA_TYPE **weights;
+	DATA_TYPE **biases;
 	unsigned int layers;
 	unsigned int *WMs;
 	unsigned int *WNs;
@@ -32,7 +33,7 @@ typedef struct {
 	unsigned int *activation;
 	char * trainingFileName;
 	unsigned int algorithm;
-	float error;
+	DATA_TYPE error;
 	unsigned int epochs;
 	unsigned int report_interval;
 	unsigned int max_time;
@@ -41,7 +42,7 @@ typedef struct {
 
 int FANN_API train_callback(struct fann *ann, struct fann_train_data *train,
                            unsigned int max_epochs, unsigned int epochs_between_reports,
-                           float desired_error, unsigned int epochs);
+                           DATA_TYPE desired_error, unsigned int epochs);
 
 void init_weights(struct fann *network, train_params *params);
 
@@ -149,7 +150,7 @@ void fann_train_matlab(train_params *params)
 
 int FANN_API train_callback(struct fann *ann, struct fann_train_data *train,
                            unsigned int max_epochs, unsigned int epochs_between_reports,
-                           float desired_error, unsigned int epochs)
+                           DATA_TYPE desired_error, unsigned int epochs)
 {
 	callback_params *cb_params;
 	time_t secs;

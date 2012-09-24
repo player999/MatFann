@@ -1,11 +1,11 @@
 function [net, log] = fann_train(net, alphabet, targets)
 numLayers = net.numLayers;
 %Extract weights (for future)
-weights.l1 = single(cat(2, net.IW{1}, net.b{1}))';
-biases.b1 = single(net.b{1});
+weights.l1 = double(cat(2, net.IW{1}, net.b{1}))';
+biases.b1 = double(net.b{1});
 for i = 2:numLayers
-    weights.(['l' int2str(i)]) = single(cat(2, net.LW{i, i - 1}, net.b{i}))';
-    biases.(['b' int2str(i)]) = single(net.b{i});
+    weights.(['l' int2str(i)]) = double(cat(2, net.LW{i, i - 1}, net.b{i}))';
+    biases.(['b' int2str(i)]) = double(net.b{i});
 end
 %Extract activation function
 activation = zeros(1, numLayers);
@@ -51,9 +51,9 @@ end
 desired_error = net.trainParam.goal;
 epochs = net.trainParam.epochs;
 report_interval = net.userdata.report_interval;
-max_time = net.userdata.time;
+max_time = net.trainParam.time;
 
-[log1 log2] = fann_train_call(weights, biases, uint32(activation), 'net', uint32(algorithm), single(desired_error), uint32(epochs), uint32(report_interval), uint32(max_time));
+[log1 log2] = fann_train_call(weights, biases, uint32(activation), 'net', uint32(algorithm), double(desired_error), uint32(epochs), uint32(report_interval), uint32(max_time));
 
 log = zeros(length(log1), 3);
 log(:,1) = [0:report_interval:(length(log1) - 1) * report_interval];
@@ -64,12 +64,12 @@ log(:,3) = log2;
 for i=1:numLayers
     fid = fopen(['net_W' int2str(i) '.net'], 'r');
     if i == 1
-        tmp = fread(fid, (net.layers{i}.dimensions + 1) * net.layers{i}.dimensions, 'float32');
+        tmp = fread(fid, (net.layers{i}.dimensions + 1) * net.layers{i}.dimensions, 'double');
         tmp = reshape(tmp, net.layers{i}.dimensions + 1, net.layers{i}.dimensions)';
         net.b{i} = tmp(:, net.layers{i}.dimensions + 1);
         net.IW{1} = tmp(:, 1:net.layers{i}.dimensions);
     else
-        tmp = fread(fid, (net.layers{i-1}.dimensions + 1) * net.layers{i}.dimensions, 'float32');
+        tmp = fread(fid, (net.layers{i-1}.dimensions + 1) * net.layers{i}.dimensions, 'double');
         tmp = reshape(tmp, net.layers{i-1}.dimensions + 1, net.layers{i}.dimensions)';
         net.b{i} = tmp(:, net.layers{i-1}.dimensions + 1);
         net.LW{i, i-1} = tmp(:, 1:net.layers{i-1}.dimensions);
