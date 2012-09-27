@@ -131,7 +131,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mLogSize[0] = *entries;
 	mLogSize[1] = 1;
 	
-	mMSEs = mxCreateNumericArray(2, mLogSize, mxSINGLE_CLASS, mxREAL);
+	mMSEs = mxCreateNumericArray(2, mLogSize, mxDOUBLE_CLASS, mxREAL);
 	mTimes = mxCreateNumericArray(2, mLogSize, mxINT32_CLASS, mxREAL);
 	mxSetData(mMSEs, MSEs);
 	mxSetData(mTimes, times);
